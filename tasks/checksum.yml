@@ -1,0 +1,42 @@
+---
+# get sha256 sum, url download file
+# https://go.dev/dl/?mode=json&include=all
+
+- name: download file checksum
+  ansible.builtin.get_url:
+    url: "{{ checksum_url }}"
+    dest: "{{ checksum_path_file }}"
+    mode: '0644'
+
+- name: registering json file contents
+  set_fact:
+    input: "{{ lookup('file', checksum_path_file) | from_json }}"
+
+- name: Filter for linux amd64 go1.20
+  set_fact:
+    version_filtered: "{{ input | community.general.json_query(query) }}"
+  vars:
+    query: "[?version=='{{ go_version }}']"
+
+- name: Filter files for linux amd64
+  set_fact:
+    release_data: "{{ version_filtered[0].files | selectattr('os', 'equalto', go_os) | selectattr('arch', 'equalto', go_arch) | list }}"
+  when: version_filtered | length > 0
+
+- name: download go version
+  ansible.builtin.get_url:
+    url: "{{ go_url }}{{ release_data[0]['filename'] }}"
+    dest: "/tmp/"
+    mode: '0644'
+
+- name: use sha256 to calculate the checksum
+  ansible.builtin.stat:
+    path: "/tmp/{{ release_data[0]['filename'] }}"
+    checksum_algorithm: sha256
+  register: archive_sha256
+
+- name: check checksum
+  ansible.builtin.assert:
+    that: "release_data[0]['sha256'] == archive_sha256.stat.checksum"
+    fail_msg: "sha256 checksum does not match! (need checksum): {{ release_data[0]['sha256'] }} != (archive checksum){{ archive_sha256.stat.checksum }}"
+    success_msg: "Checksum sha256 matched! {{ release_data[0]['sha256'] }} == {{ archive_sha256.stat.checksum }}"

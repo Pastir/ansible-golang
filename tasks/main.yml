@@ -1,0 +1,31 @@
+---
+# tasks file for pastir.golang
+
+- name: check OS support
+  ansible.builtin.assert:
+    that: "ansible_system == 'Linux'"
+    fail_msg: "The role only supports Linux OS!"
+    success_msg: "OS supported!"
+
+- name: include task defined variable
+  include_tasks: "define.yml"
+
+- name: include task defined variable
+  include_tasks: "checksum.yml"
+
+- name: extract {{release_data[0]['filename'] }} to {{ go_dir }}
+  ansible.builtin.unarchive:
+    src: "/tmp/{{release_data[0]['filename'] }}"
+    dest: "{{ go_dir }}"
+    extra_opts:
+    - --transform
+    - s/go/{{ go_version }}/
+
+- name: Get Golang version
+  command: "{{ go_dir }}/{{ go_version }}/bin/go version"
+  register: go_version_output
+  ignore_errors: yes
+
+- name: Debug Golang version output
+  ansible.builtin.debug:
+    msg: "{{ go_version_output.stdout }}"

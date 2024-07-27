@@ -1,0 +1,30 @@
+---
+
+# Variable setup.
+- name: Include variables.
+  include_vars: "vars/main.yml"
+
+- name: Define go version.
+  set_fact:
+    go_version: "{{ __go_version }}"
+  when: go_version is not defined
+
+- name: Define go_arch.
+  set_fact:
+    go_arch: "{{ __go_arch }}"
+  when: go_arch is not defined
+
+- name: Define go_os.
+  set_fact:
+    go_arch: "{{ __go_os }}"
+  when: go_os is not defined
+
+- name: Define go_dir.
+  set_fact:
+    go_dir: "{{ __go_dir }}"
+  when: go_dir is not defined
+
+- name: Define go_env_path.
+  set_fact:
+    go_env_path: "{{ __go_env_path }}"
+  when: go_env_path is not defined

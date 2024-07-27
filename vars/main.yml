@@ -1,0 +1,12 @@
+---
+# vars file for pastir.golang
+
+__go_version: "go1.20"
+__go_arch: "amd64"
+__go_os: "linux"
+__go_dir: "/usr/local"
+__go_env_path: no
+
+go_url: "https://go.dev/dl/"
+checksum_url: "https://go.dev/dl/?mode=json&include=all"
+checksum_path_file: "/tmp/checksum.json"
