@@ -31,9 +31,9 @@ Role Variables
 
   ```
 # path install bin golang release
-# default: /usr/local/go1.20
+# default: /usr/local
   ```
- -  ```- go_dir: "/usr/local/go1.20" ```
+ -  ```- go_dir: "/usr/local" ```
  
 ```
 # export PATH 
